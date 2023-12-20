@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  alarm-server:
+    image: alarm-server-node
+    container_name: alarm-server-node
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm run dev
+    ports:
+      - 8000:8000
+    volumes:
+      - ./src:/app/src
+    networks:
+      - alarm-net
+
+networks:
+  alarm-net:
+    driver: bridge
+    name: alarm-net
+
+    

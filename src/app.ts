@@ -8,6 +8,7 @@ app.use(cors({ origin: true }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
+  // eslint-disable-next-line no-console
   console.log(req.method, req.path);
   next();
 });
@@ -18,10 +19,12 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
   const { body } = req;
+  // eslint-disable-next-line no-console
   console.log(body);
   return res.send('OK');
 });
 
 app.listen(8000, () => {
+  // eslint-disable-next-line no-console
   console.log('Server started!');
 });

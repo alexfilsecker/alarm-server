@@ -2,6 +2,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 
+import authRouter from './routes/authRouter';
+
 const app = express();
 
 app.use(cors({ origin: true }));
@@ -17,12 +19,7 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.post('/', (req, res) => {
-  const { body } = req;
-  // eslint-disable-next-line no-console
-  console.log(body);
-  return res.send('OK');
-});
+app.use('/auth', authRouter);
 
 app.listen(8000, () => {
   // eslint-disable-next-line no-console

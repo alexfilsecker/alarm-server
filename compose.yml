@@ -2,8 +2,8 @@ version: '3'
 
 services:
   alarm-server:
-    image: alarm-server-node
-    container_name: alarm-server-node
+    image: alarm-server
+    container_name: alarm-server
     build:
       context: .
       dockerfile: Dockerfile

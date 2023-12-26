@@ -1,14 +1,8 @@
 import { Router } from 'express';
 
-const PASSWORD = '1234';
+import authController from '../controllers/authController';
 
 const authRouter = Router();
-authRouter.post('/login', (req, res) => {
-  if (req.body.password === PASSWORD) {
-    res.status(200).send('OK');
-    return;
-  }
-  res.status(401).send('Incorrect password');
-});
+authRouter.post('/login', authController.login);
 
 export default authRouter;

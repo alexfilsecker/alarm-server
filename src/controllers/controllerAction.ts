@@ -1,16 +1,18 @@
-import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 
 import { handleError } from '../utils/errors/errors';
 import MyValidationErrors from '../utils/errors/myValidationError';
+
+import type { Request, Response } from 'express';
+
 
 export type NormalResponse = { responseData: unknown; status?: number };
 
 const ControllerAction = async (
   req: Request,
   res: Response,
-  action: (_req: Request) => Promise<NormalResponse>
-) => {
+  action: (_req: Request) => Promise<NormalResponse>,
+): Promise<Response<unknown, Record<string, any>>> => {
   let responseData: unknown;
   let responseStatus = 200;
   try {

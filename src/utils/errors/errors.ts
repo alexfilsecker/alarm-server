@@ -1,6 +1,7 @@
-import { ValidationError } from 'express-validator';
+import MyValidationErrors from "./myValidationError";
 
-import MyValidationErrors from './myValidationError';
+import type { ValidationError } from "express-validator";
+
 
 type NormalError = {
   status: number;
@@ -9,15 +10,15 @@ type NormalError = {
 };
 
 type CUnknownError = NormalError & {
-  type: 'Unknown';
+  type: "Unknown";
 };
 
 type CError = NormalError & {
-  type: 'Error';
+  type: "Error";
 };
 
 type CValidationError = NormalError & {
-  type: 'ValidationError';
+  type: "ValidationError";
   validationErrors: ValidationError[];
 };
 
@@ -25,21 +26,26 @@ export type ErrorResponseData = {
   error: CUnknownError | CError | CValidationError;
 };
 
-export const handleError = (error: unknown) => {
+export const handleError = (
+  error: unknown
+): {
+  responseStatus: number;
+  responseData: ErrorResponseData;
+} => {
   let responseStatus = 500;
   let responseData: ErrorResponseData = {
     error: {
-      type: 'Unknown',
+      type: "Unknown",
       status: responseStatus,
-      message: 'Unknown Error',
-      stack: 'No Stack'
+      message: "Unknown Error",
+      stack: "No Stack"
     }
   };
   if (error instanceof Error) {
     responseData = {
       error: {
         ...responseData.error,
-        type: 'Error',
+        type: "Error",
         message: error.message,
         stack: error.stack
       }
@@ -49,7 +55,7 @@ export const handleError = (error: unknown) => {
       responseData = {
         error: {
           ...responseData.error,
-          type: 'ValidationError',
+          type: "ValidationError",
           status: responseStatus,
           validationErrors: error.validationErrors
         }

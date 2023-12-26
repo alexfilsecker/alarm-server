@@ -1,18 +1,25 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import { type Request, type Response } from "express";
+import jwt from "jsonwebtoken";
 
-import ControllerAction from './controllerAction';
+import ControllerAction from "./controllerAction";
 
-const secretKey = 'secretKey';
+const secretKey = "secretKey";
 
-const loginAction = async (req: Request) => {
+type LoginActionResult = {
+  responseData: {
+    token: string;
+  };
+  status: number;
+};
+
+const loginAction = async (req: Request): Promise<LoginActionResult> => {
   const { password } = req.body;
-  if (password !== '1234') {
-    throw new Error('Incorrect password');
+  if (password !== "1234") {
+    throw new Error("Incorrect password");
   }
 
-  const user = { id: 1, username: 'Alex' };
-  const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
+  const user = { id: 1, username: "Alex" };
+  const token = jwt.sign(user, secretKey, { expiresIn: "1h" });
 
   return {
     responseData: {
@@ -23,8 +30,9 @@ const loginAction = async (req: Request) => {
 };
 
 const authController = {
-  login: (req: Request, res: Response) =>
-    ControllerAction(req, res, loginAction)
+  login: async (req: Request, res: Response) => {
+    void ControllerAction(req, res, loginAction);
+  }
 };
 
 export default authController;

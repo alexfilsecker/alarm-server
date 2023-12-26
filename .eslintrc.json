@@ -1,52 +1,28 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "extends": [
-    "plugin:import/errors",
-    "plugin:import/warnings",
-    "plugin:import/typescript",
-    "plugin:@typescript-eslint/recommended",
-    "airbnb-base",
-    "plugin:prettier/recommended"
-  ],
-  "plugins": ["prettier", "@typescript-eslint"],
+  "extends": ["standard-with-typescript", "prettier"],
+  "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
   "rules": {
-    "no-param-reassign": "off",
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"],
     "import/order": [
       "error",
       {
         "groups": [
-          ["builtin", "external"],
+          "builtin",
+          "external",
           "internal",
-          ["parent", "sibling", "index"]
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "type"
         ],
         "newlines-between": "always",
         "alphabetize": { "order": "asc", "caseInsensitive": true }
       }
-    ],
-
-    "prettier/prettier": "error",
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      {
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
-      }
-    ],
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        "argsIgnorePattern": "^_"
-      }
     ]
-  },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
-    }
   }
 }

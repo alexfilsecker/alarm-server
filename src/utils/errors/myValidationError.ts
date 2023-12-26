@@ -1,4 +1,4 @@
-import { ValidationError } from 'express-validator';
+import type { ValidationError } from 'express-validator';
 
 export default class MyValidationErrors extends Error {
   public validationErrors: ValidationError[];

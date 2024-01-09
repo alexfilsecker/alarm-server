@@ -7,7 +7,6 @@ const peneRouter = Router();
 peneRouter.use(verifyToken);
 
 peneRouter.post('', (req, res) => {
-  console.log(req.body);
   res.status(200).send('pene');
 });
 

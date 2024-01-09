@@ -1,8 +1,9 @@
 import { type Request, type Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import ControllerAction from './controllerAction';
 import ROOT_USER from '../utils/constants/user';
+
+import ControllerAction from './controllerAction';
 
 type TokenEnvs = {
   tokenSecretKey: string;
@@ -36,7 +37,7 @@ const getTokenEnvs = (): TokenEnvs => {
   };
 };
 
-const makeTokens = () => {
+const makeTokens = (): { token: string; refreshToken: string } => {
   const {
     tokenSecretKey,
     refreshTokenSecretKey,
@@ -97,6 +98,9 @@ type RefreshActionResult = {
 
 const refreshAction = async (req: Request): Promise<RefreshActionResult> => {
   const { refreshToken } = req.body;
+  if (typeof refreshToken !== 'string') {
+    throw new Error('Refresh token not found');
+  }
 
   const { refreshTokenSecretKey } = getTokenEnvs();
 

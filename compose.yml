@@ -7,17 +7,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: npm run dev
+    command: yarn dev
+    env_file:
+      - .env
     ports:
       - 8000:8000
     volumes:
       - ./src:/app/src
     networks:
-      - alarm-net
+      - server-net
 
 networks:
-  alarm-net:
+  server-net:
     driver: bridge
-    name: alarm-net
-
-    
+    name: alarm-server-net

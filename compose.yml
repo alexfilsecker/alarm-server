@@ -9,15 +9,32 @@ services:
       dockerfile: Dockerfile
     command: npm run dev
     env_file:
-      - .env
+      - .envs/.postgres.env
+      - .envs/.app.env
     ports:
       - 8000:8000
     volumes:
-      - ./src:/app/src
+      - .:/app
     networks:
       - server-net
+
+  alarm-db:
+    image: postgres:latest
+    container_name: alarm-postgres
+    restart: always
+    env_file:
+      - .envs/.postgres.env
+    networks:
+      - server-net
+    ports:
+      - 5432:5432
+    volumes:
+      - alarm-postgres-data:/var/lib/postgresql/data
 
 networks:
   server-net:
     driver: bridge
     name: alarm-server-net
+
+volumes:
+  alarm-postgres-data:

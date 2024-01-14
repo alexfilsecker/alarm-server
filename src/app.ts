@@ -2,6 +2,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 
+import alarmsRouter from './routes/alarmsRouter';
 import authRouter from './routes/authRouter';
 
 declare module 'express' {
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/auth', authRouter);
+app.use('/alarms', alarmsRouter);
 
 app.listen(8000, () => {
   // eslint-disable-next-line no-console

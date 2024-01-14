@@ -105,7 +105,6 @@ const refreshAction = async (req: Request): Promise<RefreshActionResult> => {
   const { refreshTokenSecretKey } = getTokenEnvs();
 
   const decodedRefreshToken = jwt.verify(refreshToken, refreshTokenSecretKey);
-  console.log('🚀 - decodedRefreshToken:', decodedRefreshToken);
   if (typeof decodedRefreshToken === 'string') {
     throw new Error('Invalid refresh token');
   }

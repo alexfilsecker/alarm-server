@@ -2,8 +2,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 
+import alarmsRouter from './routes/alarmsRouter';
 import authRouter from './routes/authRouter';
-import peneRouter from './routes/peneRouter';
 
 declare module 'express' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/auth', authRouter);
-app.use('/pene', peneRouter);
+app.use('/alarms', alarmsRouter);
 
 app.listen(8000, () => {
   // eslint-disable-next-line no-console

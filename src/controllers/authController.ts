@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import prisma from '../prisma';
 import { comparePassword } from '../utils/auth';
+import AuthError from '../utils/errors/authError';
 
 import ControllerAction from './controllerAction';
 
@@ -89,11 +90,10 @@ type LoginActionResult = {
 
 const loginAction = async (req: Request): Promise<LoginActionResult> => {
   const { username, password } = req.body;
-  console.log('🚀 - username:', username);
 
   const user = await prisma.user.findUnique({ where: { username } });
   if (user === null) {
-    throw new Error('User not found');
+    throw new AuthError('username does not exist', 'username');
   }
 
   const correctPassword = await comparePassword(
@@ -102,7 +102,7 @@ const loginAction = async (req: Request): Promise<LoginActionResult> => {
   );
 
   if (!correctPassword) {
-    throw new Error('Incorrect password');
+    throw new AuthError('Incorrect password', 'password');
   }
 
   const { token, refreshToken } = makeTokens(user);

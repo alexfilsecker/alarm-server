@@ -1,7 +1,7 @@
-import MyValidationErrors from "./myValidationError";
+import AuthError from './authError';
+import MyValidationErrors from './myValidationError';
 
-import type { ValidationError } from "express-validator";
-
+import type { ValidationError } from 'express-validator';
 
 type NormalError = {
   status: number;
@@ -10,24 +10,29 @@ type NormalError = {
 };
 
 type CUnknownError = NormalError & {
-  type: "Unknown";
+  type: 'Unknown';
 };
 
 type CError = NormalError & {
-  type: "Error";
+  type: 'Error';
 };
 
 type CValidationError = NormalError & {
-  type: "ValidationError";
+  type: 'ValidationError';
   validationErrors: ValidationError[];
 };
 
+type CAuthError = NormalError & {
+  type: 'AuthError';
+  errorIn: 'username' | 'password';
+};
+
 export type ErrorResponseData = {
-  error: CUnknownError | CError | CValidationError;
+  error: CUnknownError | CError | CValidationError | CAuthError;
 };
 
 export const handleError = (
-  error: unknown
+  error: unknown,
 ): {
   responseStatus: number;
   responseData: ErrorResponseData;
@@ -35,30 +40,40 @@ export const handleError = (
   let responseStatus = 500;
   let responseData: ErrorResponseData = {
     error: {
-      type: "Unknown",
+      type: 'Unknown',
       status: responseStatus,
-      message: "Unknown Error",
-      stack: "No Stack"
-    }
+      message: 'Unknown Error',
+      stack: 'No Stack',
+    },
   };
   if (error instanceof Error) {
     responseData = {
       error: {
         ...responseData.error,
-        type: "Error",
+        type: 'Error',
         message: error.message,
-        stack: error.stack
-      }
+        stack: error.stack,
+      },
     };
     if (error instanceof MyValidationErrors) {
       responseStatus = 400;
       responseData = {
         error: {
           ...responseData.error,
-          type: "ValidationError",
+          type: 'ValidationError',
           status: responseStatus,
-          validationErrors: error.validationErrors
-        }
+          validationErrors: error.validationErrors,
+        },
+      };
+    } else if (error instanceof AuthError) {
+      responseStatus = 400;
+      responseData = {
+        error: {
+          ...responseData.error,
+          type: 'AuthError',
+          status: responseStatus,
+          errorIn: error.errorIn,
+        },
       };
     }
   }

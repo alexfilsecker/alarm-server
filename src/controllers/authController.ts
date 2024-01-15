@@ -1,9 +1,20 @@
+import { type User } from '@prisma/client';
 import { type Request, type Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import ROOT_USER from '../utils/constants/user';
+import prisma from '../prisma';
+import { comparePassword } from '../utils/auth';
 
 import ControllerAction from './controllerAction';
+
+type UserTokenData = {
+  userID: number;
+  username: string;
+};
+
+type RefreshTokenData = {
+  userID: number;
+};
 
 type TokenEnvs = {
   tokenSecretKey: string;
@@ -37,7 +48,7 @@ const getTokenEnvs = (): TokenEnvs => {
   };
 };
 
-const makeTokens = (): { token: string; refreshToken: string } => {
+const makeTokens = (user: User): { token: string; refreshToken: string } => {
   const {
     tokenSecretKey,
     refreshTokenSecretKey,
@@ -45,17 +56,22 @@ const makeTokens = (): { token: string; refreshToken: string } => {
     refreshTokenExprationTime,
   } = getTokenEnvs();
 
-  const user = { id: ROOT_USER.id, username: ROOT_USER.name };
-  const token = jwt.sign(user, tokenSecretKey, {
+  const userTokenData: UserTokenData = {
+    userID: user.id,
+    username: user.username,
+  };
+
+  const token = jwt.sign(userTokenData, tokenSecretKey, {
     expiresIn: tokenExprationTime,
   });
-  const refreshToken = jwt.sign(
-    { user_id: ROOT_USER.id },
-    refreshTokenSecretKey,
-    {
-      expiresIn: refreshTokenExprationTime,
-    },
-  );
+
+  const refreshTokenData: RefreshTokenData = {
+    userID: user.id,
+  };
+
+  const refreshToken = jwt.sign(refreshTokenData, refreshTokenSecretKey, {
+    expiresIn: refreshTokenExprationTime,
+  });
 
   return {
     token,
@@ -72,12 +88,24 @@ type LoginActionResult = {
 };
 
 const loginAction = async (req: Request): Promise<LoginActionResult> => {
-  const { password } = req.body;
-  if (password !== '1234') {
+  const { username, password } = req.body;
+  console.log('🚀 - username:', username);
+
+  const user = await prisma.user.findUnique({ where: { username } });
+  if (user === null) {
+    throw new Error('User not found');
+  }
+
+  const correctPassword = await comparePassword(
+    password as string,
+    user.password,
+  );
+
+  if (!correctPassword) {
     throw new Error('Incorrect password');
   }
 
-  const { token, refreshToken } = makeTokens();
+  const { token, refreshToken } = makeTokens(user);
 
   return {
     responseData: {
@@ -104,15 +132,21 @@ const refreshAction = async (req: Request): Promise<RefreshActionResult> => {
 
   const { refreshTokenSecretKey } = getTokenEnvs();
 
-  const decodedRefreshToken = jwt.verify(refreshToken, refreshTokenSecretKey);
+  const decodedRefreshToken = jwt.verify(
+    refreshToken,
+    refreshTokenSecretKey,
+  ) as RefreshTokenData | string;
   if (typeof decodedRefreshToken === 'string') {
     throw new Error('Invalid refresh token');
   }
-  if (decodedRefreshToken.user_id !== ROOT_USER.id) {
-    throw new Error('Invalid refresh token');
+  const user = await prisma.user.findUnique({
+    where: { id: decodedRefreshToken.userID },
+  });
+  if (user === null) {
+    throw new Error('User not found');
   }
 
-  const { token: newToken, refreshToken: newRefreshToken } = makeTokens();
+  const { token: newToken, refreshToken: newRefreshToken } = makeTokens(user);
 
   return {
     responseData: {

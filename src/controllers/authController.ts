@@ -8,8 +8,8 @@ import AuthError from '../utils/errors/authError';
 
 import ControllerAction from './controllerAction';
 
-type UserTokenData = {
-  userID: number;
+export type UserTokenData = {
+  userId: number;
   username: string;
 };
 
@@ -58,7 +58,7 @@ const makeTokens = (user: User): { token: string; refreshToken: string } => {
   } = getTokenEnvs();
 
   const userTokenData: UserTokenData = {
-    userID: user.id,
+    userId: user.id,
     username: user.username,
   };
 

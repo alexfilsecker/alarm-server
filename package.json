@@ -8,7 +8,7 @@
     "build": "rimraf ./dist && tsc",
     "start": "ts-node ./src/app.ts",
     "dev": "nodemon --watch src --exec ts-node src/app.ts",
-    "seed": "npx dotenv -e ./.envs/.postgres_local.env -- ts-node ./src/seeds/seeder.ts",
+    "seed": "npx dotenv -e ./.envs/.postgres_local.env -- ts-node ./prisma/seed.ts",
     "migrate": "npx dotenv -e ./.envs/.postgres_local.env -- prisma migrate dev"
   },
   "author": "",

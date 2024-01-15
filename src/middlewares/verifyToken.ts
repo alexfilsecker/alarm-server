@@ -1,15 +1,9 @@
 import jwt from 'jsonwebtoken';
 
+import { type UserTokenData } from '../controllers/authController';
+
 import type { Request, Response, NextFunction } from 'express';
 
-type DecodedToken = {
-  id: number;
-  username: string;
-};
-
-export type RequestWithDecodedToken = Request & {
-  decodedToken: DecodedToken | null;
-};
 const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
   const token = req.headers.authorization?.split(' ')[1];
   if (token === undefined) {
@@ -25,7 +19,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
     if (typeof decodedToken === 'string') {
       throw new Error('Invalid token');
     }
-    req.user = decodedToken as jwt.JwtPayload & DecodedToken;
+    req.user = decodedToken as jwt.JwtPayload & UserTokenData;
     next();
   } catch {
     res.status(401).json({ error: 'Invalid token' });

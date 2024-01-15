@@ -14,6 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed** for any bug fixes.
 - **Security** in case of vulnerabilities.
 
+## [0.5.0] - 2024-01-14
+
+### Added
+
+- WeekDay table and seed
+- Alarm table and seed
+- UserAlarm table and seed
+
+### Changed
+
+- Seeds are now in prisma directory
+- Formated schema.prisma
+
+### Removed
+
+- createdAt and updatedAt from tables
+
 ## [0.4.0] - 2024-01-14
 
 ### Added

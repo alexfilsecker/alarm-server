@@ -11,9 +11,35 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+
+  UserAlarm UserAlarm[]
+}
+
+model WeekDay {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  alarms Alarm[]
+}
+
+model Alarm {
+  id        Int    @id @default(autoincrement())
+  weekDayId Int
+  startTime String
+  endTime   String
+
+  weekDay   WeekDay     @relation(fields: [weekDayId], references: [id])
+  UserAlarm UserAlarm[]
+}
+
+model UserAlarm {
+  id      Int @id @default(autoincrement())
+  userId  Int
+  alarmId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  alarm Alarm @relation(fields: [alarmId], references: [id])
 }

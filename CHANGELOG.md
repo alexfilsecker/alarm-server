@@ -14,6 +14,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed** for any bug fixes.
 - **Security** in case of vulnerabilities.
 
+## [0.5.0] - 2024-01-14
+
+### Added
+
+- AuthError custom errors
+
+## [0.4.0] - 2024-01-14
+
+### Added
+
+- migrate and seed scripts to package.json
+- dotenv to package.json dependencies
+- ability to run seed and migrate outside from docker
+- auth utils for password
+
+### Changed
+
+- migrations fixed to follow standard
+- tables now use camelCase instead of snake_case
+- login controller now uses camelCase for token payload
+
 ## [0.3.0] - 2024-01-14
 
 ### Added

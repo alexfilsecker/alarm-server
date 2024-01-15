@@ -38,3 +38,4 @@ networks:
 
 volumes:
   alarm-postgres-data:
+    name: alarm-postgres-data

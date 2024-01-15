@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed** for any bug fixes.
 - **Security** in case of vulnerabilities.
 
+## [0.6.0] - 2024-01-14
+
+### Added
+
+- `enabled` in Alarm table
+- `userId` to Alarm table
+- unique property of `userId` and `weekDayId` in `Alarm` table
+- `alarmsController` `getAlarms` action
+
+### Removed
+
+- `UserAlarm` table and seed
+
 ## [0.5.0] - 2024-01-14
 
 ### Added

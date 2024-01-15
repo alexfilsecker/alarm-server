@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
 import alarmsSeed from './seeds/alarmsSeed';
-import userAlarmsSeed from './seeds/userAlarmsSeed';
 import usersSeed from './seeds/usersSeed';
 import weekDaysSeed from './seeds/weekDaysSeed';
 
@@ -16,11 +15,6 @@ const main = async (): Promise<void> => {
   await prisma.weekDay.createMany({ data: weekDaysSeed, skipDuplicates: true });
 
   await prisma.alarm.createMany({ data: alarmsSeed, skipDuplicates: true });
-
-  await prisma.userAlarm.createMany({
-    data: userAlarmsSeed,
-    skipDuplicates: true,
-  });
 
   await prisma.$disconnect();
 };

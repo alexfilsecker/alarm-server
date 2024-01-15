@@ -9,7 +9,7 @@ declare module 'express' {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Request {
     user?: {
-      id: number;
+      userId: number;
       username: string;
     };
   }

@@ -12,7 +12,7 @@ model User {
   username String @unique
   password String
 
-  UserAlarm UserAlarm[]
+  alarms Alarm[]
 }
 
 model WeekDay {
@@ -23,20 +23,15 @@ model WeekDay {
 }
 
 model Alarm {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
+  userId    Int
   weekDayId Int
+  enabled   Boolean @default(true)
   startTime String
   endTime   String
 
-  weekDay   WeekDay     @relation(fields: [weekDayId], references: [id])
-  UserAlarm UserAlarm[]
-}
+  weekDay WeekDay @relation(fields: [weekDayId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-model UserAlarm {
-  id      Int @id @default(autoincrement())
-  userId  Int
-  alarmId Int
-
-  user  User  @relation(fields: [userId], references: [id])
-  alarm Alarm @relation(fields: [alarmId], references: [id])
+  @@unique([weekDayId, userId])
 }

@@ -14,12 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fixed** for any bug fixes.
 - **Security** in case of vulnerabilities.
 
-## [0.5.0] - 2024-01-14
-
-### Added
-
-- AuthError custom errors
-
 ## [0.4.0] - 2024-01-14
 
 ### Added
@@ -28,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - dotenv to package.json dependencies
 - ability to run seed and migrate outside from docker
 - auth utils for password
+- AuthError custom errors
 
 ### Changed
 

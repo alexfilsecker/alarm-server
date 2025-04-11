@@ -1,33 +1,32 @@
-import MyValidationErrors from "./myValidationError";
+import MyValidationErrors from './myValidationError';
 
-import type { ValidationError } from "express-validator";
+import type { ValidationError } from 'express-validator';
 
-
-type NormalError = {
+interface NormalError {
   status: number;
   message: string;
   stack?: string;
-};
+}
 
-type CUnknownError = NormalError & {
-  type: "Unknown";
-};
+interface CUnknownError extends NormalError {
+  type: 'Unknown';
+}
 
-type CError = NormalError & {
-  type: "Error";
-};
+interface CError extends NormalError {
+  type: 'Error';
+}
 
-type CValidationError = NormalError & {
-  type: "ValidationError";
+interface CValidationError extends NormalError {
+  type: 'ValidationError';
   validationErrors: ValidationError[];
-};
+}
 
-export type ErrorResponseData = {
+export interface ErrorResponseData {
   error: CUnknownError | CError | CValidationError;
-};
+}
 
 export const handleError = (
-  error: unknown
+  error: unknown,
 ): {
   responseStatus: number;
   responseData: ErrorResponseData;
@@ -35,30 +34,30 @@ export const handleError = (
   let responseStatus = 500;
   let responseData: ErrorResponseData = {
     error: {
-      type: "Unknown",
+      type: 'Unknown',
       status: responseStatus,
-      message: "Unknown Error",
-      stack: "No Stack"
-    }
+      message: 'Unknown Error',
+      stack: 'No Stack',
+    },
   };
   if (error instanceof Error) {
     responseData = {
       error: {
         ...responseData.error,
-        type: "Error",
+        type: 'Error',
         message: error.message,
-        stack: error.stack
-      }
+        stack: error.stack,
+      },
     };
     if (error instanceof MyValidationErrors) {
       responseStatus = 400;
       responseData = {
         error: {
           ...responseData.error,
-          type: "ValidationError",
+          type: 'ValidationError',
           status: responseStatus,
-          validationErrors: error.validationErrors
-        }
+          validationErrors: error.validationErrors,
+        },
       };
     }
   }

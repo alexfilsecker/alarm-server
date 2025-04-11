@@ -1,0 +1,8 @@
+node_modules
+.env
+.gitignore
+.git
+CHANGELOG.md
+compose.yml
+Dockerfile
+package-lock.json

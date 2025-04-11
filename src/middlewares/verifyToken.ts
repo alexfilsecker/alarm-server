@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 
 import type { Request, Response, NextFunction } from 'express';
 
-type DecodedToken = {
+interface DecodedToken {
   id: number;
   username: string;
-};
+}
 
 export type RequestWithDecodedToken = Request & {
   decodedToken: DecodedToken | null;

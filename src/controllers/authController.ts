@@ -1,32 +1,33 @@
-import { type Request, type Response } from 'express';
-import jwt from 'jsonwebtoken';
+import { type Request, type Response } from "express";
+import jwt from "jsonwebtoken";
 
-import ROOT_USER from '../utils/constants/user';
+import ROOT_USER from "../utils/constants/user";
 
-import ControllerAction from './controllerAction';
+import ControllerAction from "./controllerAction";
 
-type TokenEnvs = {
+interface TokenEnvs {
   tokenSecretKey: string;
   refreshTokenSecretKey: string;
   tokenExprationTime: string;
   refreshTokenExprationTime: string;
-};
+}
+
 const getTokenEnvs = (): TokenEnvs => {
   const tokenSecretKey = process.env.TOKEN_SECRET_KEY;
   if (tokenSecretKey === undefined) {
-    throw new Error('Token secret key not found');
+    throw new Error("Token secret key not found");
   }
   const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
   if (refreshTokenSecretKey === undefined) {
-    throw new Error('Refresh token secret key not found');
+    throw new Error("Refresh token secret key not found");
   }
   const tokenExprationTime = process.env.TOKEN_EXPIRATION_TIME;
   if (tokenExprationTime === undefined) {
-    throw new Error('Token expiration time not found');
+    throw new Error("Token expiration time not found");
   }
   const refreshTokenExprationTime = process.env.REFRESH_TOKEN_EXPIRATION_TIME;
   if (refreshTokenExprationTime === undefined) {
-    throw new Error('Refresh token expiration time not found');
+    throw new Error("Refresh token expiration time not found");
   }
 
   return {
@@ -41,20 +42,15 @@ const makeTokens = (): { token: string; refreshToken: string } => {
   const {
     tokenSecretKey,
     refreshTokenSecretKey,
-    tokenExprationTime,
-    refreshTokenExprationTime,
+    // tokenExprationTime,
+    // refreshTokenExprationTime,
   } = getTokenEnvs();
 
   const user = { id: ROOT_USER.id, username: ROOT_USER.name };
-  const token = jwt.sign(user, tokenSecretKey, {
-    expiresIn: tokenExprationTime,
-  });
+  const token = jwt.sign(user, tokenSecretKey);
   const refreshToken = jwt.sign(
     { user_id: ROOT_USER.id },
     refreshTokenSecretKey,
-    {
-      expiresIn: refreshTokenExprationTime,
-    },
   );
 
   return {
@@ -63,18 +59,18 @@ const makeTokens = (): { token: string; refreshToken: string } => {
   };
 };
 
-type LoginActionResult = {
+interface LoginActionResult {
   responseData: {
     token: string;
     refreshToken: string;
   };
   status: number;
-};
+}
 
 const loginAction = async (req: Request): Promise<LoginActionResult> => {
   const { password } = req.body;
-  if (password !== '1234') {
-    throw new Error('Incorrect password');
+  if (password !== "1234") {
+    throw new Error("Incorrect password");
   }
 
   const { token, refreshToken } = makeTokens();
@@ -88,29 +84,29 @@ const loginAction = async (req: Request): Promise<LoginActionResult> => {
   };
 };
 
-type RefreshActionResult = {
+interface RefreshActionResult {
   responseData: {
     newToken: string;
     newRefreshToken: string;
   };
   status: number;
-};
+}
 
 const refreshAction = async (req: Request): Promise<RefreshActionResult> => {
   const { refreshToken } = req.body;
-  if (typeof refreshToken !== 'string') {
-    throw new Error('Refresh token not found');
+  if (typeof refreshToken !== "string") {
+    throw new Error("Refresh token not found");
   }
 
   const { refreshTokenSecretKey } = getTokenEnvs();
 
   const decodedRefreshToken = jwt.verify(refreshToken, refreshTokenSecretKey);
-  console.log('🚀 - decodedRefreshToken:', decodedRefreshToken);
-  if (typeof decodedRefreshToken === 'string') {
-    throw new Error('Invalid refresh token');
+  console.log("🚀 - decodedRefreshToken:", decodedRefreshToken);
+  if (typeof decodedRefreshToken === "string") {
+    throw new Error("Invalid refresh token");
   }
   if (decodedRefreshToken.user_id !== ROOT_USER.id) {
-    throw new Error('Invalid refresh token');
+    throw new Error("Invalid refresh token");
   }
 
   const { token: newToken, refreshToken: newRefreshToken } = makeTokens();

@@ -1,12 +1,11 @@
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import express from 'express';
+import bodyParser from "body-parser";
+import cors from "cors";
+import express from "express";
 
-import authRouter from './routes/authRouter';
-import peneRouter from './routes/peneRouter';
+import authRouter from "./routes/authRouter";
+import peneRouter from "./routes/peneRouter";
 
-declare module 'express' {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+declare module "express" {
   interface Request {
     user?: {
       id: number;
@@ -20,16 +19,18 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  // eslint-disable-next-line no-console
+app.use((req, _, next) => {
   console.log(req.method, req.path);
   next();
 });
 
-app.use('/auth', authRouter);
-app.use('/pene', peneRouter);
+app.use("/auth", authRouter);
+app.use("/pene", peneRouter);
+
+app.get("/", (_, res) => {
+  res.send("SEMEN");
+});
 
 app.listen(8000, () => {
-  // eslint-disable-next-line no-console
-  console.log('Server started!');
+  console.log("Server started!");
 });

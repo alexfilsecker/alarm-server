@@ -1,24 +1,26 @@
-import { validationResult } from 'express-validator';
+import { validationResult } from "express-validator";
 
-import { handleError } from '../utils/errors/errors';
-import MyValidationErrors from '../utils/errors/myValidationError';
+import { handleError } from "../utils/errors/errors";
+import MyValidationErrors from "../utils/errors/myValidationError";
 
-import type { Request, Response } from 'express';
+import type { Request, Response } from "express";
 
-
-export type NormalResponse = { responseData: unknown; status?: number };
+export interface NormalResponse {
+  responseData: unknown;
+  status?: number;
+}
 
 const ControllerAction = async (
   req: Request,
   res: Response,
   action: (_req: Request) => Promise<NormalResponse>,
-): Promise<Response<unknown, Record<string, any>>> => {
+): Promise<Response<unknown, Record<string, unknown>>> => {
   let responseData: unknown;
   let responseStatus = 200;
   try {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {
-      throw new MyValidationErrors('Bad Request', validationErrors.array());
+      throw new MyValidationErrors("Bad Request", validationErrors.array());
     }
     const actionResult = await action(req);
     responseData = actionResult.responseData;

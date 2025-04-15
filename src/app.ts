@@ -1,9 +1,11 @@
 import bodyParser from "body-parser";
 import cors from "cors";
+import http from "http";
 import express from "express";
 
 import authRouter from "./routes/authRouter";
 import peneRouter from "./routes/peneRouter";
+import createWSS from "./webSocket/ws";
 
 declare module "express" {
   interface Request {
@@ -15,6 +17,8 @@ declare module "express" {
 }
 
 const app = express();
+const server = http.createServer(app);
+export const wss = createWSS(server);
 
 app.use(cors({ origin: true }));
 app.use(bodyParser.json());
@@ -31,6 +35,6 @@ app.get("/", (_, res) => {
   res.send("SEMEN");
 });
 
-app.listen(8000, () => {
+server.listen(8000, () => {
   console.log("Server started!");
 });

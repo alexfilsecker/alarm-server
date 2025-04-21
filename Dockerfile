@@ -6,3 +6,4 @@ COPY package.json ./
 RUN npm install
 
 COPY . .
+COPY ./.envs/.server.env /app/.env

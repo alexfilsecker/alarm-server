@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GmtOffset {
+  id        Int      @id @default(autoincrement())
+  value     Int
+  fetchedAt DateTime @db.Timestamptz
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model Alarm {
+  id    Int @id @default(autoincrement())
+  day   Day @unique
+  start Int
+  end   Int
+}

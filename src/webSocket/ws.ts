@@ -1,20 +1,70 @@
 import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
+import type { Express } from "express";
+import http from "http";
 import sendGMTOffset from "./sendGMTOffset";
+import sendAlarms from "./sendAlarms";
 
-const createWSS = (server: Server) => {
-  const wss = new WebSocketServer({ server });
+class WSS {
+  private wss: WebSocketServer | undefined;
+  private frontSockets: Record<string, WebSocket>;
+  private esp32Socket: WebSocket | undefined;
+  public server: Server | undefined;
 
-  wss.on("connection", (ws: WebSocket) => {
-    console.log("Client connected");
-    sendGMTOffset(ws);
+  constructor() {
+    this.frontSockets = {};
+    this.server = undefined;
+    this.wss = undefined;
+    this.esp32Socket = undefined;
+  }
 
-    ws.on("message", (message) => {
-      console.log(`Received message: ${message}`);
+  public setup(app: Express): void {
+    this.server = http.createServer(app);
+    this.wss = new WebSocketServer({ server: this.server });
+
+    this.wss.on("connection", (ws, req) => {
+      const xUser = req.headers["x-user"];
+      const validUsers = new Set<string>(["ESP32", "FRONT"]);
+
+      if (
+        Array.isArray(xUser) ||
+        xUser === undefined ||
+        !validUsers.has(xUser)
+      ) {
+        ws.close();
+        return;
+      }
+
+      if (xUser === "ESP32") {
+        this.esp32Socket = ws;
+        this.setupEsp32Socket();
+        return;
+      }
+
+      const { remoteAddress } = req.socket;
+      if (remoteAddress === undefined) {
+        ws.close();
+        return;
+      }
+
+      this.frontSockets[`${xUser}@${remoteAddress}`] = ws;
     });
-  });
+  }
 
-  return wss;
-};
+  private setupEsp32Socket() {
+    if (this.esp32Socket === undefined) {
+      return;
+    }
 
-export default createWSS;
+    sendGMTOffset(this.esp32Socket);
+    sendAlarms(this.esp32Socket);
+
+    this.esp32Socket.on("message", (data) => {
+      console.log(data.toString());
+    });
+  }
+}
+
+const wss = new WSS();
+
+export default wss;

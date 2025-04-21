@@ -7,13 +7,38 @@ services:
       dockerfile: Dockerfile
     command: npm run dev
     env_file:
-      - .env
+      - .envs/.server.env
     ports:
       - 8000:8000
     volumes:
-      - ./src:/app/src
+      - type: bind
+        source: ./src
+        target: /app/src
+      - type: bind
+        source: ./prisma
+        target: /app/prisma
     networks:
       - server-net
+    restart: always
+
+  alarm-postgres:
+    image: postgres:latest
+    container_name: alarm-postgres
+    networks:
+      - server-net
+    volumes:
+      - type: volume
+        source: alarm-postgres-data
+        target: /var/lib/postgresql/data
+    env_file:
+      - .envs/.postgres.env
+    restart: always
+    ports:
+      - 5432:5432
+
+volumes:
+  alarm-postgres-data:
+    name: alarm-postgres-data
 
 networks:
   server-net:

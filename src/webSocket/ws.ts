@@ -4,6 +4,7 @@ import type { Express } from "express";
 import http from "http";
 import sendGMTOffset from "./sendGMTOffset";
 import sendAlarms from "./sendAlarms";
+import { writePoint } from "../influx/writePoint";
 
 class WSS {
   private wss: WebSocketServer | undefined;

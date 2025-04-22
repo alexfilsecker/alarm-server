@@ -8,6 +8,7 @@ services:
     command: npm run dev
     env_file:
       - .envs/.server.env
+      - .envs/.influxdb3.env
     ports:
       - 8000:8000
     volumes:
@@ -36,9 +37,26 @@ services:
     ports:
       - 5432:5432
 
+  alarm-influxdb:
+    image: quay.io/influxdb/influxdb3-core:latest
+    container_name: alarm-influxdb
+    env_file:
+      - .envs/.influxdb3.env
+    networks:
+      - server-net
+    volumes:
+      - type: volume
+        source: alarm-influxdb-data
+        target: /var/lib/influxdb3
+    command: serve --node-id=node0 --object-store=file --data-dir=/var/lib/influxdb3
+    ports:
+      - 8086:8181
+
 volumes:
   alarm-postgres-data:
     name: alarm-postgres-data
+  alarm-influxdb-data:
+    name: alarm-influxdb-data
 
 networks:
   server-net:

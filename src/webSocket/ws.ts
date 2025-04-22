@@ -4,6 +4,7 @@ import type { Express } from "express";
 import http from "http";
 import sendGMTOffset from "./sendGMTOffset";
 import sendAlarms from "./sendAlarms";
+import { z } from "zod";
 import { writePoint } from "../influx/writePoint";
 
 class WSS {
@@ -61,8 +62,54 @@ class WSS {
     sendAlarms(this.esp32Socket);
 
     this.esp32Socket.on("message", (data) => {
-      console.log(data.toString());
+      const stringData = data.toString();
+      const parsedData = JSON.parse(stringData);
+      if (typeof parsedData !== "object") {
+        console.log(`Recieved ${typeof parsedData}: ${parsedData}`);
+        return;
+      }
+
+      this.handleObjectData(parsedData);
     });
+  }
+
+  private handleObjectData(jsonParsedData: object) {
+    const baseMessageSchema = z.object({
+      event: z.union([
+        z.literal("GmtOffsetUpdated"),
+        z.literal("AlarmsUpdated"),
+        z.literal("SendRead"),
+      ]),
+    });
+
+    const { event } = baseMessageSchema.parse(jsonParsedData);
+    switch (event) {
+      case "GmtOffsetUpdated":
+      case "AlarmsUpdated":
+        this.handleVoidEvent(event);
+        break;
+      case "SendRead":
+        this.handleSendRead(jsonParsedData);
+    }
+  }
+
+  private handleVoidEvent(event: string) {
+    console.log(event);
+  }
+
+  private handleSendRead(jsonParsedData: object) {
+    const sendReadSchema = z.object({
+      event: z.literal("SendRead"),
+      data: z.object({
+        read: z.number(),
+        millisEpochTime: z.number(),
+      }),
+    });
+
+    const { data } = sendReadSchema.parse(jsonParsedData);
+    const { read, millisEpochTime } = data;
+    const date = new Date(millisEpochTime);
+    writePoint(read, date);
   }
 }
 

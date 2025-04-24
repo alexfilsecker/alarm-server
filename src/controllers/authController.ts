@@ -1,56 +1,27 @@
 import { type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
-
 import ROOT_USER from "../utils/constants/user";
-
 import ControllerAction from "./controllerAction";
-
-interface TokenEnvs {
-  tokenSecretKey: string;
-  refreshTokenSecretKey: string;
-  tokenExprationTime: string;
-  refreshTokenExprationTime: string;
-}
-
-const getTokenEnvs = (): TokenEnvs => {
-  const tokenSecretKey = process.env.TOKEN_SECRET_KEY;
-  if (tokenSecretKey === undefined) {
-    throw new Error("Token secret key not found");
-  }
-  const refreshTokenSecretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
-  if (refreshTokenSecretKey === undefined) {
-    throw new Error("Refresh token secret key not found");
-  }
-  const tokenExprationTime = process.env.TOKEN_EXPIRATION_TIME;
-  if (tokenExprationTime === undefined) {
-    throw new Error("Token expiration time not found");
-  }
-  const refreshTokenExprationTime = process.env.REFRESH_TOKEN_EXPIRATION_TIME;
-  if (refreshTokenExprationTime === undefined) {
-    throw new Error("Refresh token expiration time not found");
-  }
-
-  return {
-    tokenSecretKey,
-    refreshTokenSecretKey,
-    tokenExprationTime,
-    refreshTokenExprationTime,
-  };
-};
+import LoginError from "../utils/errors/loginError";
+import { getTokenEnvs } from "../utils/tokenEnvs";
+import InvalidTokenError from "../utils/errors/invalidTokenError";
 
 const makeTokens = (): { token: string; refreshToken: string } => {
   const {
     tokenSecretKey,
     refreshTokenSecretKey,
-    // tokenExprationTime,
-    // refreshTokenExprationTime,
+    tokenExprationTime,
+    refreshTokenExprationTime,
   } = getTokenEnvs();
 
   const user = { id: ROOT_USER.id, username: ROOT_USER.name };
-  const token = jwt.sign(user, tokenSecretKey);
+  const token = jwt.sign(user, tokenSecretKey, {
+    expiresIn: tokenExprationTime,
+  });
   const refreshToken = jwt.sign(
     { user_id: ROOT_USER.id },
     refreshTokenSecretKey,
+    { expiresIn: refreshTokenExprationTime },
   );
 
   return {
@@ -68,9 +39,23 @@ interface LoginActionResult {
 }
 
 const loginAction = async (req: Request): Promise<LoginActionResult> => {
-  const { password } = req.body;
+  const { password, username } = req.body;
+
+  let passwordError = "";
   if (password !== "1234") {
-    throw new Error("Incorrect password");
+    passwordError = "Incorrect password";
+  }
+
+  let usernameError = "";
+  if (username !== "alex") {
+    usernameError = "incorrect username";
+  }
+
+  if (usernameError) {
+    throw new LoginError({
+      username: usernameError === "" ? undefined : usernameError,
+      password: passwordError === "" ? undefined : passwordError,
+    });
   }
 
   const { token, refreshToken } = makeTokens();
@@ -101,7 +86,6 @@ const refreshAction = async (req: Request): Promise<RefreshActionResult> => {
   const { refreshTokenSecretKey } = getTokenEnvs();
 
   const decodedRefreshToken = jwt.verify(refreshToken, refreshTokenSecretKey);
-  console.log("🚀 - decodedRefreshToken:", decodedRefreshToken);
   if (typeof decodedRefreshToken === "string") {
     throw new Error("Invalid refresh token");
   }
@@ -120,12 +104,31 @@ const refreshAction = async (req: Request): Promise<RefreshActionResult> => {
   };
 };
 
+interface VerifyActionResult {
+  responseData: {
+    valid: boolean;
+  };
+  status: number;
+}
+
+const verifyAction = async (req: Request): Promise<VerifyActionResult> => {
+  return {
+    responseData: {
+      valid: true,
+    },
+    status: 200,
+  };
+};
+
 const authController = {
   login: async (req: Request, res: Response) => {
     void ControllerAction(req, res, loginAction);
   },
   refresh: async (req: Request, res: Response) => {
     void ControllerAction(req, res, refreshAction);
+  },
+  verify: async (req: Request, res: Response) => {
+    void ControllerAction(req, res, verifyAction);
   },
 };
 

@@ -6,7 +6,5 @@ export const writePoint = async (read: number, timestamp: Date) => {
     .setFloatField("read", read)
     .setTimestamp(timestamp);
 
-  console.log("writing point");
   await influxClient.write(point, INFLUX_DATABASE);
-  console.log("point writen");
 };

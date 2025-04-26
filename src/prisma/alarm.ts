@@ -1,5 +1,5 @@
 import { Day } from "../../prisma/generated";
-import prisma from "./prisma";
+import prismaClient from "./prisma";
 
 const DAY_ORDER = [
   Day.MONDAY,
@@ -12,7 +12,7 @@ const DAY_ORDER = [
 ];
 
 export const getAlarms = async (): Promise<number[][]> => {
-  const alarmRows = await prisma.alarm.findMany();
+  const alarmRows = await prismaClient.alarm.findMany();
 
   const returnAlarms: number[][] = [];
   DAY_ORDER.forEach((day) => {

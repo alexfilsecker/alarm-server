@@ -1,8 +1,8 @@
 import { getGmtOffset, GmtData } from "../service/timeApi";
-import prisma from "./prisma";
+import prismaClient from "./prisma";
 
 export const insertNewGmtOffset = async ({ offset, fetchedAt }: GmtData) => {
-  return prisma.gmtOffset.create({
+  return prismaClient.gmtOffset.create({
     data: {
       value: offset,
       fetchedAt,
@@ -11,7 +11,7 @@ export const insertNewGmtOffset = async ({ offset, fetchedAt }: GmtData) => {
 };
 
 export const getGmtOffsetFromDb = async (): Promise<number> => {
-  const gmtOffsetRow = await prisma.gmtOffset.findFirst({
+  const gmtOffsetRow = await prismaClient.gmtOffset.findFirst({
     orderBy: {
       fetchedAt: "desc",
     },

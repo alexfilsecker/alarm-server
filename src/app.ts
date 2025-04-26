@@ -3,7 +3,6 @@ import cors from "cors";
 import express from "express";
 
 import authRouter from "./routes/authRouter";
-import peneRouter from "./routes/peneRouter";
 import wss from "./webSocket/ws";
 
 declare module "express" {
@@ -28,7 +27,6 @@ app.use((req, _, next) => {
 });
 
 app.use("/auth", authRouter);
-app.use("/pene", peneRouter);
 
 app.get("/", (_, res) => {
   res.send("SEMEN");

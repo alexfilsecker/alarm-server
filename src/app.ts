@@ -4,6 +4,7 @@ import express from "express";
 
 import authRouter from "./routes/authRouter";
 import wss from "./webSocket/ws";
+import alarmRouter from "./routes/alarmRouter";
 
 declare module "express" {
   interface Request {
@@ -27,6 +28,7 @@ app.use((req, _, next) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/alarms", alarmRouter);
 
 app.get("/", (_, res) => {
   res.send("SEMEN");

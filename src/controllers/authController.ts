@@ -4,7 +4,6 @@ import ROOT_USER from "../utils/constants/user";
 import ControllerAction from "./controllerAction";
 import LoginError from "../utils/errors/loginError";
 import { getTokenEnvs } from "../utils/tokenEnvs";
-import InvalidTokenError from "../utils/errors/invalidTokenError";
 
 const makeTokens = (): { token: string; refreshToken: string } => {
   const {
@@ -111,7 +110,7 @@ interface VerifyActionResult {
   status: number;
 }
 
-const verifyAction = async (req: Request): Promise<VerifyActionResult> => {
+const verifyAction = async (_: Request): Promise<VerifyActionResult> => {
   return {
     responseData: {
       valid: true,

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ControllerAction from "./controllerAction";
-import { Alarm, Day } from "../../prisma/generated";
 import { getAlarms } from "../prisma/alarm";
+import { Day } from "../../prisma/generated";
 
 type ReturnAlarms = Record<
   Day,

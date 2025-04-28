@@ -21,6 +21,9 @@ services:
     networks:
       - server-net
     restart: always
+    depends_on:
+      - alarm-postgres
+      - alarm-influxdb
 
   alarm-postgres:
     image: postgres:latest

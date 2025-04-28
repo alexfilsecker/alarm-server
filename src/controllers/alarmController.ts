@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import ControllerAction from "./controllerAction";
-import { Day } from "../../prisma/generated";
+import { Alarm, Day } from "../../prisma/generated";
 import { getAlarms } from "../prisma/alarm";
 
-type ReturnAlarms = Record<Day, { start: number; end: number }>;
+type ReturnAlarms = Record<
+  Day,
+  { start: number; end: number; enabled: boolean }
+>;
 
 interface GetActionResult {
   responseData: ReturnAlarms;
@@ -16,6 +19,7 @@ const getAction = async (_: Request): Promise<GetActionResult> => {
     alarms[alarm.day] = {
       start: alarm.start,
       end: alarm.end,
+      enabled: alarm.enabled,
     };
     return alarms;
   }, {} as ReturnAlarms);

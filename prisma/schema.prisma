@@ -25,8 +25,9 @@ enum Day {
 }
 
 model Alarm {
-  id    Int @id @default(autoincrement())
-  day   Day @unique
-  start Int
-  end   Int
+  id      Int     @id @default(autoincrement())
+  day     Day     @unique
+  enabled Boolean
+  start   Int
+  end     Int
 }

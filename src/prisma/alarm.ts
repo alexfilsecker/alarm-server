@@ -7,6 +7,7 @@ export const getAlarms = async (): Promise<Omit<Alarm, "id">[]> => {
       day: true,
       start: true,
       end: true,
+      enabled: true,
     },
   });
 };

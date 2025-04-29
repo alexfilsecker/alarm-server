@@ -4,16 +4,17 @@ import { handleError } from "../utils/errors/errors";
 import MyValidationErrors from "../utils/errors/myValidationError";
 
 import type { Request, Response } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 
 export interface NormalResponse {
   responseData: unknown;
   status?: number;
 }
 
-const ControllerAction = async (
+const ControllerAction = async <T = object>(
   req: Request,
   res: Response,
-  action: (_req: Request) => Promise<NormalResponse>,
+  action: (_: Request<ParamsDictionary, unknown, T>) => Promise<NormalResponse>,
 ): Promise<Response<unknown, Record<string, unknown>>> => {
   let responseData: unknown;
   let responseStatus = 200;

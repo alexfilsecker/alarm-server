@@ -25,19 +25,17 @@ class WSS {
     this.wss = new WebSocketServer({ server: this.server });
 
     this.wss.on("connection", (ws, req) => {
-      const xUser = req.headers["x-user"];
+      if (req.url === undefined || req.headers.host === undefined) return;
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const clientType = url.searchParams.get("client");
       const validUsers = new Set<string>(["ESP32", "FRONT"]);
 
-      if (
-        Array.isArray(xUser) ||
-        xUser === undefined ||
-        !validUsers.has(xUser)
-      ) {
+      if (clientType === null || !validUsers.has(clientType)) {
         ws.close();
         return;
       }
 
-      if (xUser === "ESP32") {
+      if (clientType === "ESP32") {
         this.esp32Socket = ws;
         this.setupEsp32Socket();
         return;
@@ -49,7 +47,7 @@ class WSS {
         return;
       }
 
-      this.frontSockets[`${xUser}@${remoteAddress}`] = ws;
+      this.frontSockets[`${clientType}@${remoteAddress}`] = ws;
     });
   }
 
@@ -103,6 +101,10 @@ class WSS {
 
   private handleVoidEvent(event: string) {
     console.log(event);
+    Object.values(this.frontSockets).forEach((frontWS) => {
+      console.log("sending hola to front ws");
+      frontWS.send(event);
+    });
   }
 
   private handleSendRead(jsonParsedData: object) {

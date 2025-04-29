@@ -102,8 +102,7 @@ class WSS {
   private handleVoidEvent(event: string) {
     console.log(event);
     Object.values(this.frontSockets).forEach((frontWS) => {
-      console.log("sending hola to front ws");
-      frontWS.send(event);
+      frontWS.send(JSON.stringify({ event }));
     });
   }
 

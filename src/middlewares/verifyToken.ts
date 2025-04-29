@@ -27,7 +27,6 @@ const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
     if (typeof decodedToken === "string") {
       throw new InvalidTokenError();
     }
-    req.user = decodedToken as jwt.JwtPayload & DecodedToken;
     next();
   } catch (error: unknown) {
     const { responseData, responseStatus } = handleError(error);

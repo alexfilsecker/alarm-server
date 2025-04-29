@@ -6,15 +6,6 @@ import authRouter from "./routes/authRouter";
 import wss from "./webSocket/ws";
 import alarmRouter from "./routes/alarmRouter";
 
-declare module "express" {
-  interface Request {
-    user?: {
-      id: number;
-      username: string;
-    };
-  }
-}
-
 const app = express();
 
 wss.setup(app);

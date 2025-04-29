@@ -53,13 +53,21 @@ class WSS {
     });
   }
 
+  public sendAlarms() {
+    if (this.esp32Socket === undefined) {
+      return;
+    }
+
+    sendAlarms(this.esp32Socket);
+  }
+
   private setupEsp32Socket() {
     if (this.esp32Socket === undefined) {
       return;
     }
 
     sendGMTOffset(this.esp32Socket);
-    sendAlarms(this.esp32Socket);
+    this.sendAlarms();
 
     this.esp32Socket.on("message", (data) => {
       const stringData = data.toString();

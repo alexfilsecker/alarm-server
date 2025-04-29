@@ -4,6 +4,7 @@ import { getAlarms, updateAlarms } from "../prisma/alarm";
 import { Day } from "../../prisma/generated";
 import type { ParamsDictionary } from "express-serve-static-core";
 import { PutAlarmsBodyType } from "../middlewares/validation/alarms";
+import wss from "../webSocket/ws";
 
 type ReturnAlarms = Record<
   Day,
@@ -40,6 +41,7 @@ const putAction = async (
   req: Request<ParamsDictionary, unknown, PutAlarmsBodyType>,
 ): Promise<PutActionResult> => {
   await updateAlarms(req.body);
+  wss.sendAlarms();
   return {
     responseData: {},
     status: 204,

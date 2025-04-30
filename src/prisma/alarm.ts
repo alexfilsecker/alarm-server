@@ -14,7 +14,7 @@ export const getAlarms = async (): Promise<Omit<Alarm, "id">[]> => {
 };
 
 export const updateAlarms = async (body: PutAlarmsBodyType): Promise<void> => {
-  Object.entries(body).forEach(async ([day, alarmInfo]) => {
+  const promises = Object.entries(body).map(async ([day, alarmInfo]) => {
     await prismaClient.alarm.update({
       where: {
         day: day as Day,
@@ -26,4 +26,5 @@ export const updateAlarms = async (body: PutAlarmsBodyType): Promise<void> => {
       },
     });
   });
+  await Promise.all(promises);
 };

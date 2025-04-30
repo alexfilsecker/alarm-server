@@ -21,7 +21,7 @@ const sendAlarms = async (ws: WebSocket): Promise<void> => {
     if (alarm === undefined) {
       return;
     }
-    alarms.push([alarm.start, alarm.end]);
+    alarms.push([alarm.start, alarm.end, alarm.enabled ? 1 : 0]);
   });
 
   ws.send(

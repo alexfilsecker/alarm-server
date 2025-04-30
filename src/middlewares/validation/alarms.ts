@@ -5,12 +5,12 @@ const alarmSchema = z.object({
   start: z
     .number()
     .gte(0)
-    .lt(24 * 60 - 1),
+    .lte(24 * 60),
 
   end: z
     .number()
     .gte(0)
-    .lt(24 * 60 - 1),
+    .lte(24 * 60),
   enabled: z.boolean(),
 });
 

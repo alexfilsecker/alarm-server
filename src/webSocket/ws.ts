@@ -57,6 +57,7 @@ class WSS {
       }
       const counter = this.frontSocketsCounter[frontString];
       this.frontSockets[`${frontString}-${counter}`] = ws;
+      this.setupFrontSocket(ws);
     });
   }
 
@@ -66,6 +67,19 @@ class WSS {
     }
 
     sendAlarms(this.esp32Socket);
+  }
+
+  private setupFrontSocket(socket: WebSocket) {
+    socket.on("message", (data) => {
+      const stringData = data.toString();
+      const parsedData = JSON.parse(stringData);
+      if (typeof parsedData !== "object") {
+        console.log(`Recieved ${typeof parsedData}: ${parsedData}`);
+        return;
+      }
+
+      this.handleObjectData(parsedData);
+    });
   }
 
   private setupEsp32Socket() {
@@ -94,6 +108,7 @@ class WSS {
         z.literal("GmtOffsetUpdated"),
         z.literal("AlarmsUpdated"),
         z.literal("SendRead"),
+        z.literal("BEEP"),
       ]),
     });
 
@@ -105,11 +120,13 @@ class WSS {
         break;
       case "SendRead":
         this.handleSendRead(jsonParsedData);
+        break;
+      case "BEEP":
+        this.handleBeep(jsonParsedData);
     }
   }
 
   private handleVoidEvent(event: string) {
-    console.log(event);
     Object.values(this.frontSockets).forEach((frontWS) => {
       frontWS.send(JSON.stringify({ event }));
     });
@@ -128,6 +145,21 @@ class WSS {
     const { read, millisEpochTime } = data;
     const date = new Date(millisEpochTime);
     writePoint(read, date);
+  }
+
+  private handleBeep(jsonParsedData: object) {
+    const sendReadSchema = z.object({
+      event: z.literal("BEEP"),
+      data: z.boolean(),
+    });
+
+    const { data: value } = sendReadSchema.parse(jsonParsedData);
+    this.sendBeep(value);
+  }
+
+  private sendBeep(value: boolean) {
+    if (this.esp32Socket === undefined) return;
+    this.esp32Socket.send(JSON.stringify({ event: "BEEP", value }));
   }
 }
 

@@ -12,12 +12,14 @@ class WSS {
   private frontSockets: Record<string, WebSocket>;
   private esp32Socket: WebSocket | undefined;
   public server: Server | undefined;
+  private frontSocketsCounter: Record<string, number>;
 
   constructor() {
     this.frontSockets = {};
     this.server = undefined;
     this.wss = undefined;
     this.esp32Socket = undefined;
+    this.frontSocketsCounter = {};
   }
 
   public setup(app: Express): void {
@@ -47,7 +49,14 @@ class WSS {
         return;
       }
 
-      this.frontSockets[`${clientType}@${remoteAddress}`] = ws;
+      const frontString = `${clientType}@${remoteAddress}`;
+      if (!(frontString in this.frontSocketsCounter)) {
+        this.frontSocketsCounter[frontString] = 1;
+      } else {
+        this.frontSocketsCounter[frontString] += 1;
+      }
+      const counter = this.frontSocketsCounter[frontString];
+      this.frontSockets[`${frontString}-${counter}`] = ws;
     });
   }
 

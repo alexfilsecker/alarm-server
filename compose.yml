@@ -54,6 +54,7 @@ services:
     command: serve --node-id=node0 --object-store=file --data-dir=/var/lib/influxdb3
     ports:
       - 8086:8181
+    restart: always
 
 volumes:
   alarm-postgres-data:

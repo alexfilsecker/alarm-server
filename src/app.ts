@@ -5,6 +5,7 @@ import express from "express";
 import authRouter from "./routes/authRouter";
 import wss from "./webSocket/ws";
 import alarmRouter from "./routes/alarmRouter";
+import graphsRouter from "./routes/graphsRouter";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use((req, _, next) => {
 
 app.use("/auth", authRouter);
 app.use("/alarms", alarmRouter);
+app.use("/graphs", graphsRouter);
 
 app.get("/", (_, res) => {
   res.send("SEMEN");

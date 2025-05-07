@@ -6,6 +6,7 @@ import sendGMTOffset from "./sendGMTOffset";
 import sendAlarms from "./sendAlarms";
 import { z } from "zod";
 import { writePoint } from "../influx/writePoint";
+import { getGmtOffsetFromDb } from "../prisma/gmtOffset";
 
 class WSS {
   private wss: WebSocketServer | undefined;
@@ -145,6 +146,20 @@ class WSS {
     const { read, millisEpochTime } = data;
     const date = new Date(millisEpochTime);
     writePoint(read, date);
+
+    getGmtOffsetFromDb().then((gmtOffset) => {
+      const socketSend = {
+        event: "SendRead",
+        data: {
+          time: millisEpochTime + gmtOffset * 1000,
+          read,
+        },
+      };
+      Object.values(this.frontSockets).forEach((socket) => {
+        socket.send(JSON.stringify(socketSend));
+      });
+      return;
+    });
   }
 
   private handleBeep(jsonParsedData: object) {

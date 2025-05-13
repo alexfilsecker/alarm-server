@@ -4,6 +4,7 @@ import MyValidationErrors from "./myValidationError";
 import type { ValidationError } from "express-validator";
 import NoTokenError from "./noTokenError";
 import InvalidTokenError from "./invalidTokenError";
+import { TokenExpiredError } from "jsonwebtoken";
 
 interface NormalError {
   status: number;
@@ -37,6 +38,10 @@ interface CInvalidTokenError extends NormalError {
   type: "InvalidToken";
 }
 
+interface CExpiredTokenError extends NormalError {
+  type: "TokenExpired";
+}
+
 export interface ErrorResponseData {
   error:
     | CUnknownError
@@ -44,7 +49,8 @@ export interface ErrorResponseData {
     | CValidationError
     | CLoginError
     | CNoTokenError
-    | CInvalidTokenError;
+    | CInvalidTokenError
+    | CExpiredTokenError;
 }
 
 export const handleError = (
@@ -111,6 +117,15 @@ export const handleError = (
       error: {
         ...responseData.error,
         type: "InvalidToken",
+        status: responseStatus,
+      },
+    };
+  } else if (error instanceof TokenExpiredError) {
+    responseStatus = 401;
+    responseData = {
+      error: {
+        ...responseData.error,
+        type: "TokenExpired",
         status: responseStatus,
       },
     };

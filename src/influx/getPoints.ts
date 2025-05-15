@@ -1,9 +1,9 @@
 import { getGmtOffsetFromDb } from "../prisma/gmtOffset";
 import influxClient, { INFLUX_DATABASE, INFLUX_SCALE_TABLE } from "./client";
 
-export const getPoints = async (): Promise<number[][]> => {
+export const getPoints = async (range: string): Promise<number[][]> => {
   const result = influxClient.query(
-    `SELECT * FROM ${INFLUX_SCALE_TABLE} WHERE time >= now() - INTERVAL '3h';`,
+    `SELECT * FROM ${INFLUX_SCALE_TABLE} WHERE time >= now() - INTERVAL '${range}';`,
     INFLUX_DATABASE,
   );
 

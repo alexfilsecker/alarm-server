@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import ControllerAction from "./controllerAction";
 import { getPoints } from "../influx/getPoints";
+import { graphsSchema } from "../middlewares/validation/graphs";
 
 interface GetReturn {
   responseData: {
@@ -8,8 +9,9 @@ interface GetReturn {
   };
 }
 
-const getAction = async (_: Request): Promise<GetReturn> => {
-  const points = await getPoints();
+const getAction = async (req: Request): Promise<GetReturn> => {
+  const query = graphsSchema.parse(req.query);
+  const points = await getPoints(query.range);
   return { responseData: { points } };
 };
 

@@ -1,0 +1,61 @@
+services:
+  alarm-server-cloud:
+    image: alarm-server-cloud
+    container_name: alarm-server-cloud
+    build:
+      context: .
+      dockerfile: Dockerfile.cloud
+    command: npm run run
+    env_file:
+      - .envs/.cloud/.server.env
+      - .envs/.cloud/.influxdb3.env
+    ports:
+      - 8000:8000
+    networks:
+      - server-net-cloud
+    restart: always
+    depends_on:
+      - alarm-postgres-cloud
+      - alarm-influxdb-cloud
+
+  alarm-postgres-cloud:
+    image: postgres:latest
+    container_name: alarm-postgres-cloud
+    networks:
+      - server-net-cloud
+    volumes:
+      - type: volume
+        source: alarm-postgres-cloud-data
+        target: /var/lib/postgresql/data
+    env_file:
+      - .envs/.cloud/.postgres.env
+    restart: always
+    ports:
+      - 5432:5432
+
+  alarm-influxdb-cloud:
+    image: quay.io/influxdb/influxdb3-core:latest
+    container_name: alarm-influxdb-cloud
+    env_file:
+      - .envs/.cloud/.influxdb3.env
+    networks:
+      - server-net-cloud
+    volumes:
+      - type: volume
+        source: alarm-influxdb-cloud-data
+        target: /var/lib/influxdb3
+    command: serve --node-id=node0 --object-store=file --data-dir=/var/lib/influxdb3
+    ports:
+      - 8086:8181
+    restart: always
+
+volumes:
+  alarm-postgres-cloud-data:
+    name: alarm-postgres-cloud-data
+  alarm-influxdb-cloud-data:
+    name: alarm-influxdb-cloud-data
+
+networks:
+  server-net-cloud:
+    driver: bridge
+    name: alarm-server-net-cloud

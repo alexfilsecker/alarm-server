@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     command: npm run dev
     env_file:
-      - .envs/.server.env
-      - .envs/.influxdb3.env
+      - .envs/.local/.server.env
+      - .envs/.local/.influxdb3.env
     ports:
       - 8000:8000
     volumes:
@@ -35,7 +35,7 @@ services:
         source: alarm-postgres-data
         target: /var/lib/postgresql/data
     env_file:
-      - .envs/.postgres.env
+      - .envs/.local/.postgres.env
     restart: always
     ports:
       - 5432:5432
@@ -44,7 +44,7 @@ services:
     image: quay.io/influxdb/influxdb3-core:latest
     container_name: alarm-influxdb
     env_file:
-      - .envs/.influxdb3.env
+      - .envs/.local/.influxdb3.env
     networks:
       - server-net
     volumes:
